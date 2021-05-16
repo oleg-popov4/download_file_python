@@ -1,0 +1,1 @@
+wget -p -nc -r -l 1 ––convert-links %1 
