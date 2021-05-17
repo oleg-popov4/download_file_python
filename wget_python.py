@@ -7,7 +7,6 @@ def downloud_file_requests(url,file_name, chunk_size = 8192):
     r = requests.get(url,stream=True)
     Download_erfolg = False
     if(r.status_code == 200):
-        #file_len = len(r.content)
         file_len = r.headers.get('Content-Length')
         try:
             file_len = int(file_len)
@@ -109,12 +108,16 @@ def check_system() -> str:
 
 
 def main():
+    os.chdir(r'E:\Парсинг_на_Python\download_file_python')
     link = "https://h32.mangas.rocks/auto/47/39/65/ZCD_294_006.jpg_res.jpg?t=1621187506&u=0&h=5BHwYS2NTNvd3xvxR34LhQ"
-    name = 'page.jpg'
+    link = "http://c.aaa200.rocks/auto/03/65/94/002.htm?t=1621124325&u=0&h=bRrKCAdFoKzQY6XOjyE1cA'"
+    link = 'ipv4.download.thinkbroadband.com/5MB.zip'
+    name = 'Магия_вернувшегося_должна_быть_особенной___Gwihwanjaui_mabeob-eun_teugbyeolhaeya_habnida_Глава_№111.zip'
+    #name = 'test.zip'
     status1 = downloud_wget_win(link, name_link=name,output=True)
     print(status1)
-    status2 = downloud_file_requests(link,name)
-    print(status2)
+    #status2 = downloud_file_requests(link,name)
+    #print(status2)
 #end main
 
 if __name__ == '__main__':
