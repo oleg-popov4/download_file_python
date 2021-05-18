@@ -60,33 +60,64 @@ def check_downloud_status(output_str :str) ->bool:
     return downl_status
 #end find_downloud_status
 
-def downloud_wget_win(link :str, name_link = '', wget_log = 'off/on', output = False) -> bool:
-    #Leerzeichen am Ende jeden Befehls nicht vergessen
-    str_add = ' '
-    wget_path = r'path C:\Program Files (x86)\WgetGnuWin32\bin' + str_add
+def decode_bytes_wget(input, name_link) -> None:
+    system = find_system()
+    unicode_decode_list = ['ansi']
+    win_error_unicode = 'CP866'
+    text = ''
+    flag_text = False
+    if (system == 'win'):
+        #Teste verschiedene unicode. Name vom link muss in der ausgabe sein
+        for unicode in unicode_decode_list:
+            try:
+                text = str(input,unicode)
+                if ( name_link in text):
+                    print(text)
+                    flag_text = True
+                    break
+            except UnicodeDecodeError:
+                pass
+            #end try
+        #end for
+        if (not(flag_text)): print(str(input,win_error_unicode))
+    elif (system == 'linux'):
+        print('linux muss getestet werden')
+        print('bytes:',input)
+    else:
+        print('bytes:',input)
+#decode_bytes_wget
+
+def downloud_wget(link :str, name_link = '', wget_log = 'off/on', output = False, terminal_show = False) -> bool:
+    downl_befehl = create_wget_command(link, name_link = name_link, wget_log = wget_log, output = output)
+    if (terminal_show):
+        downl_befehl = create_wget_command(link, name_link = name_link, wget_log = wget_log, output = output, details=True)
+        process = subprocess.run(downl_befehl,shell=True)
+        return True
+    else:
+        #downl_befehl = 'path C:\\Program Files (x86)\\WgetGnuWin32\\bin && wget -c -nv -O Магия_вернувшегося_должна_быть_особенной___Gwihwanjaui_mabeob-eun_teugbyeolhaeya_habnida_Глава_№148.zip https://mangabook.org/download/gwihwanjaui-mabeobeun-teugbyeolhaeya-habnida/436169'
+        process  = subprocess.run(downl_befehl,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
+        wget_output = process.stderr #+ process.stdin + process.stdout
+        if (output) : decode_bytes_wget(wget_output, name_link)
+    return check_downloud_status(str(wget_output))
+#end downloud_wget
+
+def create_wget_command(link :str, name_link = '', wget_log = 'off/on', output = False, details = False)-> str:
+    system = find_system()
+    str_add = ' ' #Leerzeichen am Ende jeden Befehls nicht vergessen
+    wget_path = r'path C:\Program Files (x86)\WgetGnuWin32\bin' + str_add if ( system == 'win') else ''
     wget_log_name = 'wget.log' + str_add
-    cmd_trenzeichen = '&&' + str_add
-    log_befehl = '-a' + str_add + wget_log_name if (wget_log == 'on' or wget_log == 'On' or wget_log == True) else ''
-    name_befehl = '-O' + str_add + name_link + ' ' if ( name_link != '') else ''
-    downl_befehl = wget_path + cmd_trenzeichen + 'wget -c -nv' + str_add + log_befehl + name_befehl + link
-    process  = subprocess.run(downl_befehl,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True )
-    wget_output = process.stderr
-    if output : print(wget_output)
-    return check_downloud_status(wget_output)
+    cmd_trenzeichen = '\n' + str_add if ( system == 'win') else ''
+    log_command = '-a' + str_add + wget_log_name if (wget_log == 'on' or wget_log == 'On' or wget_log == True) else ''
+    name_command = '-O' + str_add + name_link + ' ' if ( name_link != '') else ''
+    wget_command = 'wget -c' + str_add if details else 'wget -c -nv' + str_add 
+    downl_befehl = wget_path + cmd_trenzeichen + wget_command + log_command + name_command + link
+    return downl_befehl
     #process  = subprocess.Popen(downl_befehl,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True )
     #output, errors = process.communicate()
     #process.wait()
-#end downloud_wget_win
-
-def create_wget_command():
-    pass
 #end create_wget_befehl
 
-def downloud_wget_linux(link :str, name_link = '', wget_log = 'off/on', output = False)-> bool:
-    pass
-#end downloud_wget_linux
-
-def check_system() -> str:
+def find_system() -> str:
     system = ''
     win_sys = 'win'
     linux_sys = 'linux'
@@ -101,20 +132,19 @@ def check_system() -> str:
     elif (sys_output_str ==  linux_str):
         system = linux_sys
     else:
-        print('System wurde nicht erkant', 'wget_python.py','Funktion: check_system')
+        print('System wurde nicht erkant', 'wget_python.py','Funktion: find_system')
     #end if
     return system
-#end check_system
+#end find_system
 
 
 def main():
     os.chdir(r'E:\Парсинг_на_Python\download_file_python')
-    link = "https://h32.mangas.rocks/auto/47/39/65/ZCD_294_006.jpg_res.jpg?t=1621187506&u=0&h=5BHwYS2NTNvd3xvxR34LhQ"
-    link = "http://c.aaa200.rocks/auto/03/65/94/002.htm?t=1621124325&u=0&h=bRrKCAdFoKzQY6XOjyE1cA'"
     link = 'ipv4.download.thinkbroadband.com/5MB.zip'
     name = 'Магия_вернувшегося_должна_быть_особенной___Gwihwanjaui_mabeob-eun_teugbyeolhaeya_habnida_Глава_№111.zip'
-    #name = 'test.zip'
-    status1 = downloud_wget_win(link, name_link=name,output=True)
+    name = 'test.zip'
+    status1 = downloud_wget(link, name_link=name,output=True)
+    #status1 = wget_python.downloud_wget(link, name_link=name,output=True, terminal_show=True)
     print(status1)
     #status2 = downloud_file_requests(link,name)
     #print(status2)
@@ -122,4 +152,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    print(check_system())
