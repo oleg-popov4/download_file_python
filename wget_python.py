@@ -1,6 +1,6 @@
 import re
 import os
-import subprocess
+import subprocess #pip install subprocess
 import requests #pip install requests
 
 def downloud_file_requests(url,file_name, chunk_size = 8192):
@@ -143,12 +143,14 @@ def main():
     link = 'ipv4.download.thinkbroadband.com/5MB.zip'
     name = 'Магия_вернувшегося_должна_быть_особенной___Gwihwanjaui_mabeob-eun_teugbyeolhaeya_habnida_Глава_№111.zip'
     name = 'test.zip'
-    status1 = downloud_wget(link, name_link=name,output=True)
+    #status1 = downloud_wget(link, name_link=name,output=True)
     #status1 = wget_python.downloud_wget(link, name_link=name,output=True, terminal_show=True)
-    print(status1)
+    #print(status1)
     #status2 = downloud_file_requests(link,name)
     #print(status2)
 #end main
 
 if __name__ == '__main__':
+    print(__file__)
+    print(os.path.realpath(__file__))
     main()
