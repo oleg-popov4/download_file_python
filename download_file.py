@@ -23,6 +23,7 @@ class DownloadFile():
         #end if
         return system
     #end find_system
+
     #--------------------------------
     #--------------------------------
     verzeichniss = os.path.dirname(os.path.abspath(__file__))
@@ -35,9 +36,26 @@ class DownloadFile():
         self.chunk_size = chunk_size
     #end __init__
 
+    def test_wget(self, cd_param :str):
+        '''
+        Parameter
+        1 - url muss immer eingegeben werden
+        Optionale Parameter
+        2 - gehe in Eingegebene verzeichniss 
+        3 - Datei Name oder ''
+        4 - log Datei oder ''
+        '''
+        subprocess.run(['wget_cmd.cmd',self.url,cd_param,self.file_name],shell=True)#, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        pass
+    #end test_wget
+
     def ausgabe(self) -> None:
-        print('url',self.url)
-        print('name',self.file_name)
+        print('verzeichniss:',DownloadFile.verzeichniss)
+        print('system:',DownloadFile.system)
+        print('url:',self.url)
+        print('name:',self.file_name)
+    #end ausgabe
+        
 
     def requests_bar(self,prozent_schritt = 5):
         url = self.url
@@ -75,12 +93,17 @@ class DownloadFile():
             print('\nDownload von ' + file_name + ' erfolgreich abgeschlossen [1]')
             Download_erfolg = True
         return Download_erfolg
-#end downloud_file_requests
+    #end requests_bar
 
 
 #end DownloadFile
 
 if __name__ == '__main__':
     print('-----------------------')
-    test = DownloadFile('haha','file name')
+    url = 'ipv4.download.thinkbroadband.com/5MB.zip'
+    name = 'test.zip'
+    cd = r'C:\Users\Super PC\Downloads'
+    test = DownloadFile(url,name)
     test.ausgabe()
+    test.test_wget(cd)
+    
