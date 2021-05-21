@@ -3,57 +3,77 @@ import os
 import subprocess #pip install subprocess
 import requests #pip install requests
 
-class DownloadFile():
-    #--------------------------------
-    #------------Funktionen----------
-    def find_system(win_sys = 'win', linux_sys = 'linux') -> str:
-        system = ''
-        win_str = '\\'
-        linux_str = '/'
-        test_str = ' '
-        slasch_str = os.path.join(test_str, test_str)
-        slasch_str = slasch_str.replace(test_str,'')
-        sys_output_str = slasch_str.replace(test_str,'')
-        if (sys_output_str ==  win_str):
-            system = win_sys
-        elif (sys_output_str ==  linux_str):
-            system = linux_sys
-        else:
-            print('System wurde nicht erkant', 'wget_python.py','Funktion: find_system')
-        #end if
-        return system
-    #end find_system
 
-    #--------------------------------
-    #--------------------------------
-    verzeichniss = os.path.dirname(os.path.abspath(__file__))
+#--------------------------------
+#------------Funktionen----------
+def find_system(win_sys = 'win', linux_sys = 'linux') -> str:
+    system = ''
+    win_str = '\\'
+    linux_str = '/'
+    test_str = ' '
+    slasch_str = os.path.join(test_str, test_str)
+    slasch_str = slasch_str.replace(test_str,'')
+    sys_output_str = slasch_str.replace(test_str,'')
+    if (sys_output_str ==  win_str):
+        system = win_sys
+    elif (sys_output_str ==  linux_str):
+        system = linux_sys
+    else:
+        print('System wurde nicht erkant', 'wget_python.py','Funktion: find_system')
+    #end if
+    return system
+#end find_system
+
+def get_wget_cmd_dir() ->str:
+    wget_cmd_name = 'wget_cmd.cmd'
+    temp_cd = os.path.dirname(os.path.abspath(__file__))
+    flag_wget_cmd = os.path.isfile( os.path.join(temp_cd,wget_cmd_name) )
+    if (flag_wget_cmd): 
+        return temp_cd
+    else:
+        print(wget_cmd_name,'wurde nicht gefunden und wird erzeugt')
+#end get_wget_cmd_dir
+
+#--------------------------------
+#--------------------------------
+
+class DownloadFile():
+    dir_cmd = get_wget_cmd_dir()
     system = find_system()
 
     def __init__(self, url :str, file_name = '', chunk_size = 8192):
         """Constructor"""
         self.url = url
-        self.file_name = file_name
+        #file_name kann auch mit verzeichniss angegeben werden
+        temp_save_dir = os.path.dirname(file_name)
+        self.save_dir = temp_save_dir if temp_save_dir !='' else os.getcwd()
+        self.file_name =  os.path.basename(file_name) 
         self.chunk_size = chunk_size
     #end __init__
 
-    def test_wget(self, cd_param :str):
+    def test_wget(self):
         '''
+        ------------------------------------
         Parameter
         1 - url muss immer eingegeben werden
+        2 - speicherort vom wget.exe
         Optionale Parameter
-        2 - gehe in Eingegebene verzeichniss 
-        3 - Datei Name oder ''
-        4 - log Datei oder ''
+        3 - gehe in Eingegebene verzeichniss 
+        4 - Datei Name oder ''
+        5 - log Datei oder ''
+        ------------------------------------
         '''
-        subprocess.run(['wget_cmd.cmd',self.url,cd_param,self.file_name],shell=True)#, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(['wget_cmd.cmd',self.url,DownloadFile.dir_cmd,self.save_dir,self.file_name],
+                        shell=True)#, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         pass
     #end test_wget
 
     def ausgabe(self) -> None:
-        print('verzeichniss:',DownloadFile.verzeichniss)
+        print('dir_cmd:',DownloadFile.dir_cmd)
         print('system:',DownloadFile.system)
         print('url:',self.url)
         print('name:',self.file_name)
+        print('save_dir',self.save_dir)
     #end ausgabe
         
 
@@ -99,11 +119,9 @@ class DownloadFile():
 #end DownloadFile
 
 if __name__ == '__main__':
-    print('-----------------------')
-    url = 'ipv4.download.thinkbroadband.com/5MB.zip'
+    url = 'https://dl.hentai-chan.pro/engine/download.php?id=24181'
     name = 'test.zip'
-    cd = r'C:\Users\Super PC\Downloads'
-    test = DownloadFile(url,name)
+    cd = r'E:\Парсинг_на_Python\download_file_python\__pycache__'
+    test = DownloadFile(url,os.path.join(cd,name))
     test.ausgabe()
-    test.test_wget(cd)
     
