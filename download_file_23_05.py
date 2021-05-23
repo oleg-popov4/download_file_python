@@ -106,6 +106,7 @@ class DownloadFile():
         match = re.search(search_patern,wget_output)
         wget_status = str(match.group()) if (match != None) else ''
         downl_status = False if ( wget_status == '') else True
+        if downl_status: print(wget_output)
         return downl_status
     #end check_downloud_status
 
