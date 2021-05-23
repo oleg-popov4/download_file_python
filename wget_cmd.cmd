@@ -1,5 +1,8 @@
 goto START
 ------------------------------------
+Subprozess hat grosse problem mit Symbolen ^,=,\ -> Brauche ubersetzungsprotokol
+set str=Я тебя раскусил, ты оборотень =  то как человек, то как баран
+set str=%str:то==%
 Parameter
 1 - url muss immer eingegeben werden
 2 - speicherort vom wget.exe
@@ -19,10 +22,17 @@ if not defined wget_verz set wget_verz=""
 if not defined cd_verz set cd_verz=""
 if not defined dat_name set dat_name=""
 if not defined wget_log set wget_log=""
+echo url %url%
+echo wget_verz %wget_verz%
+echo cd_verz %cd_verz%
+echo par3 %3
+echo dat_name %dat_name%
+echo wget_log %wget_log%
 if %url%=="" echo "url Eingabe fehlt" & goto END 
 if %wget_verz%=="" echo "path Eingabe fehlt" & goto END 
 path %wget_verz%
 if not %cd_verz%=="" cd /d %cd_verz%
+dir
 if not %dat_name%=="" (if not %wget_log%=="" goto wget_4_par )
 if not %dat_name%=="" goto wget_only_3
 if not %wget_log%=="" goto wget_only_4
