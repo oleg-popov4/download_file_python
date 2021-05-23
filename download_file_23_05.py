@@ -95,7 +95,7 @@ class DownloadFile():
         self.file_name =  os.path.basename(file_name) 
         self.chunk_size = chunk_size
         self.system  = DownloadFile.system
-        self.start_download(self.only_wget)
+        self.start_download()
     #end __init__
 
     def check_wget_downloud_status(self) ->bool:
