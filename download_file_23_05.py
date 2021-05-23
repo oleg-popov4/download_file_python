@@ -91,7 +91,8 @@ class DownloadFile():
         self.stderr = ''
         #file_name kann auch mit verzeichniss angegeben werden
         temp_save_dir = os.path.dirname(file_name)
-        self.save_dir = temp_save_dir if temp_save_dir !='' else os.getcwd()
+        self.aktuelle_dir = os.getcwd()
+        self.save_dir = temp_save_dir if temp_save_dir !='' else self.aktuelle_dir
         self.file_name =  os.path.basename(file_name) 
         self.chunk_size = chunk_size
         self.system  = DownloadFile.system
@@ -130,15 +131,18 @@ class DownloadFile():
         5 - log Datei oder ''
         ------------------------------------
         '''
+        #gehe in Verzeichniss mit 'wget_cmd.cmd
+        os.chdir(self.dir_cmd)
         prozess = subprocess.run(['wget_cmd.cmd',self.url,DownloadFile.dir_cmd,self.save_dir,self.file_name],
                         shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        os.chdir(self.aktuelle_dir)
         if hasattr(prozess, 'stdin'):
             temp = prozess.stdin
             self.stdin = str(temp)
             self.stdin_byte = temp
         if hasattr(prozess, 'stdout'):
             temp = prozess.stdout
-            self.stdout = str(temp)
+            self.stdout = str(temp)#'CP866'
             self.stdout_byte = temp
         if hasattr(prozess, 'stderr'):
             temp = prozess.stderr
@@ -149,6 +153,7 @@ class DownloadFile():
     def info(self) -> None:
         print('dir_cmd:',DownloadFile.dir_cmd)
         print('system:',DownloadFile.system)
+        print('aktuelle_dir:',self.aktuelle_dir)
         print('url:',self.url)
         print('name:',self.file_name)
         print('save_dir',self.save_dir)
