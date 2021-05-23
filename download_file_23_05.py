@@ -6,6 +6,7 @@ import requests #pip install requests
 ToDo
 1 Linux implementation
 2 Ubeprufefile existens vor dem download, dann wget only
+3 wget log file
 '''
 
 #--------------------------------
