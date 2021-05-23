@@ -2,11 +2,15 @@ import re
 import os
 import subprocess #pip install subprocess
 import requests #pip install requests
-
+'''
+ToDo
+1 Linux implementation
+2 Ubeprufefile existens vor dem download, dann wget only
+'''
 
 #--------------------------------
 #------------Funktionen----------
-def find_system(win_sys = 'win', linux_sys = 'linux') -> str:
+def find_system(win_sys , linux_sys ) -> str:
     system = ''
     win_str = '\\'
     linux_str = '/'
@@ -31,27 +35,91 @@ def get_wget_cmd_dir() ->str:
     if (flag_wget_cmd): 
         return temp_cd
     else:
-        print(wget_cmd_name,'wurde nicht gefunden und wird erzeugt')
+        print(wget_cmd_name,'wurde nicht gefunden und muss erzeugt werden')
+        input('Program abbrechen?')
 #end get_wget_cmd_dir
+
+def create_wget_log() -> str:
+    directory = os.getcwd()
+    log_name = os.path.basename(directory)+'.log'
+    return log_name
+#end create_wget_log_link
+
+def decode_bytes_wget(input, name_link) -> None:
+    system = find_system()
+    unicode_decode_list = ['ansi']
+    win_error_unicode = 'CP866'
+    text = ''
+    flag_text = False
+    if (system == 'win'):
+        #Teste verschiedene unicode. Name vom link muss in der ausgabe sein
+        for unicode in unicode_decode_list:
+            try:
+                text = str(input,unicode)
+                if ( name_link in text):
+                    print(text)
+                    flag_text = True
+                    break
+            except UnicodeDecodeError:
+                pass
+            #end try
+        #end for
+        if (not(flag_text)): print(str(input,win_error_unicode))
+    elif (system == 'linux'):
+        print('linux muss getestet werden')
+        print('bytes:',input)
+    else:
+        print('bytes:',input)
+#decode_bytes_wget
 
 #--------------------------------
 #--------------------------------
 
 class DownloadFile():
     dir_cmd = get_wget_cmd_dir()
-    system = find_system()
+    win_sys = 'win'
+    linux_sys = 'linux'
+    system = find_system(win_sys,linux_sys)
 
-    def __init__(self, url :str, file_name = '', chunk_size = 8192):
+    def __init__(self, url :str, file_name = '', only_wget = False, chunk_size = 8192):
         """Constructor"""
         self.url = url
+        self.dowload_status = False
+        self.only_wget = only_wget
+        self.stdin = ''
+        self.stdout = ''
+        self.stderr = ''
         #file_name kann auch mit verzeichniss angegeben werden
         temp_save_dir = os.path.dirname(file_name)
         self.save_dir = temp_save_dir if temp_save_dir !='' else os.getcwd()
         self.file_name =  os.path.basename(file_name) 
         self.chunk_size = chunk_size
+        self.system  = DownloadFile.system
+        self.start_download(self.only_wget)
     #end __init__
 
-    def test_wget(self):
+    def check_wget_downloud_status(self) ->bool:
+        wget_output = self.stderr
+        successful_status = '\[1\]' #[1] wird fuer re modul angepasst
+        search_patern = 'URL:http.+->.+' +successful_status
+        match = re.search(search_patern,wget_output)
+        wget_status = str(match.group()) if (match != None) else ''
+        downl_status = False if ( wget_status == '') else True
+        return downl_status
+    #end check_downloud_status
+
+    def start_download(self):
+        if ( self.system == DownloadFile.win_sys ):
+            print('starte win down')
+            self.wget_win()
+        #end if
+        self.dowload_status = self.check_wget_downloud_status()
+        #wget kann versuchen download fortsetzen, deswegen gibt es only_wget
+        if (not(self.dowload_status) and not(self.only_wget)):
+            self.dowload_status = self.requests_bar()
+    #end start_download
+
+    def wget_win(self):
         '''
         ------------------------------------
         Parameter
@@ -63,17 +131,32 @@ class DownloadFile():
         5 - log Datei oder ''
         ------------------------------------
         '''
-        subprocess.run(['wget_cmd.cmd',self.url,DownloadFile.dir_cmd,self.save_dir,self.file_name],
-                        shell=True)#, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        pass
+        prozess = subprocess.run(['wget_cmd.cmd',self.url,DownloadFile.dir_cmd,self.save_dir,self.file_name],
+                        shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if hasattr(prozess, 'stdin'):
+            temp = prozess.stdin
+            self.stdin = str(temp)
+            self.stdin_byte = temp
+        if hasattr(prozess, 'stdout'):
+            temp = prozess.stdout
+            self.stdout = str(temp)
+            self.stdout_byte = temp
+        if hasattr(prozess, 'stderr'):
+            temp = prozess.stderr
+            self.stderr = str(temp)
+            self.stderr_byte = temp
     #end test_wget
 
-    def ausgabe(self) -> None:
+    def info(self) -> None:
         print('dir_cmd:',DownloadFile.dir_cmd)
         print('system:',DownloadFile.system)
         print('url:',self.url)
         print('name:',self.file_name)
         print('save_dir',self.save_dir)
+        print('stdin:',self.stdin)
+        print('stdout:',self.stdout)
+        print('stderr:',self.stderr)
+        print('dowload_status:',self.dowload_status)
     #end ausgabe
         
 
@@ -119,9 +202,9 @@ class DownloadFile():
 #end DownloadFile
 
 if __name__ == '__main__':
-    url = 'https://dl.hentai-chan.pro/engine/download.php?id=24181'
+    url = 'ipv4.download.thinkbroadband.com/5MB.zip'
     name = 'test.zip'
     cd = r'E:\Парсинг_на_Python\download_file_python\__pycache__'
     test = DownloadFile(url,os.path.join(cd,name))
-    test.ausgabe()
+    test.info()
     

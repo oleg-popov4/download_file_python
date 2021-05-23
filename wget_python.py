@@ -41,8 +41,7 @@ def downloud_file_requests(url,file_name, chunk_size = 8192):
 
 def create_wget_log() -> str:
     directory = os.getcwd()
-    double_slash_index = directory.rfind("\\")+1
-    log_name = directory[double_slash_index:] + '.log'
+    log_name = os.path.basename(directory)+'.log'
     return log_name
 #end create_wget_log_link
 
