@@ -73,6 +73,16 @@ def decode_bytes_wget(input, name_link) -> None:
         print('bytes:',input)
 #decode_bytes_wget
 
+def convert_char_to_int(string :str) ->str:
+    char_list = ['=', '^','"','<','>','|', ',', '&'] 
+                # 61  94  34  60  62  124  44   38
+    output = string[:]
+    add_str = 'ord'
+    for el in char_list:
+        output = output.replace(el, add_str+str(ord(el)) )
+    return output
+#end convert_char_to_int
+
 #--------------------------------
 #--------------------------------
 
@@ -135,7 +145,12 @@ class DownloadFile():
         '''
         #gehe in Verzeichniss mit 'wget_cmd.cmd
         os.chdir(self.dir_cmd)
-        prozess = subprocess.run(['wget_cmd.cmd',self.url,DownloadFile.dir_cmd,self.save_dir,self.file_name],
+        #Codiere sonderzeichen
+        url = convert_char_to_int(self.url)
+        dir_cmd = convert_char_to_int(DownloadFile.dir_cmd)
+        save_dir = convert_char_to_int(self.save_dir)
+        file_name = convert_char_to_int(self.file_name)
+        prozess = subprocess.run(['wget_cmd.cmd', url, dir_cmd, save_dir, file_name],
                         shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         os.chdir(self.aktuelle_dir)
         if hasattr(prozess, 'stdin'):
@@ -150,7 +165,8 @@ class DownloadFile():
             temp = prozess.stderr
             self.stderr = str(temp)
             self.stderr_byte = temp
-    #end test_wget
+    #end     def wget_win(self):
+
 
     def info(self) -> None:
         print('dir_cmd:',DownloadFile.dir_cmd)
@@ -208,9 +224,9 @@ class DownloadFile():
 #end DownloadFile
 
 if __name__ == '__main__':
-    url = 'ipv4.download.thinkbroadband.com/5MB.zip'
-    name = 'test.zip'
+    url = 'http://a.aaa200.rocks/auto/03/70/64/001.png?t=1621797157&u=0&h=8ZZNJYBYyrUO_L4GJsNZQQ'
+    name = 'page_1.png'
     cd = r'E:\Парсинг_на_Python\download_file_python\__pycache__'
     test = DownloadFile(url,os.path.join(cd,name))
-    test.info()
+    #test.info()
     

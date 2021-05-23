@@ -1,8 +1,6 @@
 goto START
 ------------------------------------
 Subprozess hat grosse problem mit Symbolen ^,=,\ -> Brauche ubersetzungsprotokol
-set str=Я тебя раскусил, ты оборотень =  то как человек, то как баран
-set str=%str:то==%
 Parameter
 1 - url muss immer eingegeben werden
 2 - speicherort vom wget.exe
@@ -12,22 +10,21 @@ Optionale Parameter
 5 - log Datei oder ''
 ------------------------------------
 :START
-set url=%1
-set wget_verz=%2
-set cd_verz=%3
-set dat_name=%4
-set wget_log=%5
-if not defined url set url=""
-if not defined wget_verz set wget_verz=""
-if not defined cd_verz set cd_verz=""
-if not defined dat_name set dat_name=""
-if not defined wget_log set wget_log=""
-echo url %url%
-echo wget_verz %wget_verz%
-echo cd_verz %cd_verz%
-echo par3 %3
-echo dat_name %dat_name%
-echo wget_log %wget_log%
+call :convert_int_to_char %1
+set "url=%temp_str%"
+
+call :convert_int_to_char %2
+set "wget_verz=%temp_str%"
+
+call :convert_int_to_char %3
+set "cd_verz=%temp_str%"
+
+call :convert_int_to_char %4
+set "dat_name=%temp_str%"
+
+call :convert_int_to_char %5
+set "wget_log=%temp_str%"
+
 if %url%=="" echo "url Eingabe fehlt" & goto END 
 if %wget_verz%=="" echo "path Eingabe fehlt" & goto END 
 path %wget_verz%
@@ -57,6 +54,22 @@ goto END
     echo "wget_only_1"
     wget -c -nv %url%
 goto END
+
+
+:convert_int_to_char
+rem ['=','^', '"', '<', '>', '|', ',', '&'] 
+rem   61  94  34   60   62   124   44   38
+set temp_str=%1
+if not defined temp_str set temp_str=""
+set "temp_str=%temp_str:ord61=^=%"
+set "temp_str=%temp_str:ord94=^^%"
+set "temp_str=%temp_str:ord34=^"%"
+set "temp_str=%temp_str:ord60=^<%"
+set "temp_str=%temp_str:ord62=^>%"
+set "temp_str=%temp_str:ord124=^|%"
+set "temp_str=%temp_str:ord44=^,%"
+set "temp_str=%temp_str:ord38=^&%"
+exit /b
 
 :END
 
