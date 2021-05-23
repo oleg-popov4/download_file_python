@@ -110,7 +110,6 @@ class DownloadFile():
 
     def start_download(self):
         if ( self.system == DownloadFile.win_sys ):
-            print('starte win down')
             self.wget_win()
         #end if
         self.dowload_status = self.check_wget_downloud_status()
