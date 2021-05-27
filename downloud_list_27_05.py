@@ -6,7 +6,7 @@ import os
 import requests #pip install requests 
 import subprocess #pip install subprocess.run
 from PyQt5.QtWidgets import (QFileDialog, QApplication) #pip install PyQt5 pip install pyqt5-tools
-import download_file_23_05 as download_file
+import download_file_27_05 as download_file
 #import platform
 #import platform print (platform.system())
 #Текущая рабочая директория возвращается os.getcwd()
