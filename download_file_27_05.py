@@ -165,7 +165,7 @@ class DownloadFile():
             temp = prozess.stderr
             self.stderr = str(temp)
             self.stderr_byte = temp
-    #end     def wget_win(self):
+    #end  wget_win(self):
 
 
     def info(self) -> None:
@@ -219,9 +219,7 @@ class DownloadFile():
             Download_erfolg = True
         return Download_erfolg
     #end requests_bar
-
-
-#end DownloadFile
+#end DownloadFile class
 
 if __name__ == '__main__':
     url = 'http://a.aaa200.rocks/auto/03/70/64/001.png?t=1621797157&u=0&h=8ZZNJYBYyrUO_L4GJsNZQQ'
