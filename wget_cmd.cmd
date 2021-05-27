@@ -1,77 +1,62 @@
 goto START
 ------------------------------------
-Subprozess hat grosse problem mit Symbolen ^,=,\ -> Brauche ubersetzungsprotokol
-Parameter
-1 - url muss immer eingegeben werden
-2 - speicherort vom wget.exe
-Optionale Parameter
-3 - gehe in Eingegebene verzeichniss 
-4 - Datei Name oder ''
-5 - log Datei oder ''
+    Parameter
+    1 url       - url muss immer eingegeben werden
+    2 wget_dir  - speicherort vom wget.exe
+            Optionale Parameter
+    3 cd_dir    - gehe in Eingegebene verzeichniss 
+    4 file_name - Datei Name oder ''
+    5 wget_log  - log Datei oder ''
 ------------------------------------
 :START
-call :convert_int_to_char %1
-set "url=%temp_str%"
 
-call :convert_int_to_char %2
-set "wget_verz=%temp_str%"
+set url=%1
+if not defined url set url=""
+if %url%=="" echo "url Eingabe fehlt" & goto END
+echo url %url%
 
-call :convert_int_to_char %3
-set "cd_verz=%temp_str%"
+set wget_dir=%2
+if not defined wget_dir set wget_dir=""
+if %wget_dir%=="" echo "path Eingabe fehlt" & goto END 
+path %wget_dir%
+echo wget_dir %wget_dir%
 
-call :convert_int_to_char %4
-set "dat_name=%temp_str%"
+set cd_dir=%3
+if not defined cd_dir set cd_dir=""
+if not %cd_dir%=="" cd /d %cd_dir%
+echo cd_dir %cd_dir%
 
-call :convert_int_to_char %5
-set "wget_log=%temp_str%"
+set file_name=%4
+if not defined file_name set file_name=""
+echo file_name %file_name%
 
-if %url%=="" echo "url Eingabe fehlt" & goto END 
-if %wget_verz%=="" echo "path Eingabe fehlt" & goto END 
-path %wget_verz%
-if not %cd_verz%=="" cd /d %cd_verz%
-dir
-if not %dat_name%=="" (if not %wget_log%=="" goto wget_4_par )
-if not %dat_name%=="" goto wget_only_3
+set wget_log=%5
+if not defined wget_log set wget_log=""
+echo wget_log %wget_log%
+
+if not %file_name%=="" (if not %wget_log%=="" goto wget_4_par )
+if not %file_name%=="" goto wget_only_3
 if not %wget_log%=="" goto wget_only_4
 goto wget_only_1
 
 :wget_4_par
     echo "wget_4_par"
-    wget -c -nv -a %wget_log% -O %dat_name% %url%
-goto END
+    wget -c -nv -a %wget_log% -O %file_name% %url%
+goto EXIT
 
 :wget_only_3
     echo "wget_only_3"
-    wget -c -nv -O %dat_name% %url%
-goto END
+    wget -c -nv -O %file_name% %url%
+goto EXIT
 
 :wget_only_4
     echo "wget_only_4"
     wget -c -nv -a %wget_log% %url%
-goto END
+goto EXIT
 
 :wget_only_1
     echo "wget_only_1"
     wget -c -nv %url%
-goto END
+goto EXIT
 
-
-:convert_int_to_char
-rem ['=','^', '"', '<', '>', '|', ',', '&'] 
-rem   61  94  34   60   62   124   44   38
-set temp_str=%1
-if not defined temp_str set temp_str=""
-set "temp_str=%temp_str:ord61=^=%"
-set "temp_str=%temp_str:ord94=^^%"
-set "temp_str=%temp_str:ord34=^"%"
-set "temp_str=%temp_str:ord60=^<%"
-set "temp_str=%temp_str:ord62=^>%"
-set "temp_str=%temp_str:ord124=^|%"
-set "temp_str=%temp_str:ord44=^,%"
-set "temp_str=%temp_str:ord38=^&%"
-exit /b
-
-:END
-
-
-
+:EXIT

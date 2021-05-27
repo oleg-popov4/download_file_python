@@ -73,15 +73,15 @@ def decode_bytes_wget(input, name_link) -> None:
         print('bytes:',input)
 #decode_bytes_wget
 
-def convert_char_to_int(string :str) ->str:
-    char_list = ['=', '^','"','<','>','|', ',', '&'] 
-                # 61  94  34  60  62  124  44   38
-    output = string[:]
-    add_str = 'ord'
-    for el in char_list:
-        output = output.replace(el, add_str+str(ord(el)) )
-    return output
-#end convert_char_to_int
+# def convert_char_to_int(string :str) ->str:
+#     char_list = ['=', '^','"','<','>','|', ',', '&'] 
+#                 # 61  94  34  60  62  124  44   38
+#     output = string[:]
+#     add_str = 'ord'
+#     for el in char_list:
+#         output = output.replace(el, add_str+str(ord(el)) )
+#     return output
+# #end convert_char_to_int
 
 #--------------------------------
 #--------------------------------
@@ -135,22 +135,22 @@ class DownloadFile():
         '''
         ------------------------------------
         Parameter
-        1 - url muss immer eingegeben werden
-        2 - speicherort vom wget.exe
-        Optionale Parameter
-        3 - gehe in Eingegebene verzeichniss 
-        4 - Datei Name oder ''
-        5 - log Datei oder ''
+        1 url       - url muss immer eingegeben werden
+        2 wget_dir  - speicherort vom wget.exe
+                Optionale Parameter
+        3 cd_dir    - gehe in Eingegebene verzeichniss 
+        4 file_name  - Datei Name oder ''
+        5 wget_log  - log Datei oder ''
         ------------------------------------
         '''
-        #gehe in Verzeichniss mit 'wget_cmd.cmd
+        #gehe in Verzeichniss wo liegt wget_cmd.cmd
         os.chdir(self.dir_cmd)
         #Codiere sonderzeichen
-        url = convert_char_to_int(self.url)
-        dir_cmd = convert_char_to_int(DownloadFile.dir_cmd)
-        save_dir = convert_char_to_int(self.save_dir)
-        file_name = convert_char_to_int(self.file_name)
-        prozess = subprocess.run(['wget_cmd.cmd', url, dir_cmd, save_dir, file_name],
+        url = self.url
+        cmd_dir = DownloadFile.dir_cmd
+        save_dir = self.save_dir
+        file_name = self.file_name
+        prozess = subprocess.run('wget_cmd.cmd "{0}" "{1}" "{2}" "{3}"'.format(url, cmd_dir, save_dir, file_name),
                         shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         os.chdir(self.aktuelle_dir)
         if hasattr(prozess, 'stdin'):
